@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import random
 from collections import defaultdict
 from pathlib import Path
 from time import time
@@ -270,6 +271,17 @@ class AbsTaskRetrieval(AbsTask):
                     self.queries[hf_subset][split],
                     self.relevant_docs[hf_subset][split],
                 )
+                [item for sublist in [[1,2], [3,4]] for item in sublist]
+            if bool(self.debug_downsample):
+                queries_list = list(queries.items())
+                random.shuffle(queries_list)
+                queries = dict(queries_list[: self.debug_downsample])
+                relevant_docs = {k:v for k,v in relevant_docs.items() if k in queries.keys()}
+                irr_keys = [e for e in corpus.keys() if e not in relevant_docs.keys()]
+                irr_keys = random.sample(irr_keys, 4 * self.debug_downsample if self.debug_downsample < len(irr_keys) else len(irr_keys) - 1)
+                corpus_keys = irr_keys + list(relevant_docs.keys())
+                corpus = {k:v for k,v in corpus.items() if k in corpus_keys}
+                logger.info(f"Downsampled to {len(queries)} queries, {len(corpus)} documents")
             scores[hf_subset] = self._evaluate_subset(
                 retriever, corpus, queries, relevant_docs, hf_subset, **kwargs
             )
