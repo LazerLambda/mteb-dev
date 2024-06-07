@@ -1,4 +1,4 @@
-<h1 align="center"><i>Mini</i> - Massive Text Embedding Benchmark</h1>
+<h1 align="center">Massive Text Embedding Benchmark - <i>Mini</i></h1>
 
 <p align="center">
     <a href="https://github.com/embeddings-benchmark/mteb/releases">
