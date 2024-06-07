@@ -106,14 +106,14 @@ TASK_LIST = (
     + TASK_LIST_STS
 )
 
-model_name = "average_word_embeddings_komninos"
+model_name = "Mihaiii/test25"
 model = SentenceTransformer(model_name)
 
 for task in TASK_LIST:
     logger.info(f"Running task: {task}")
     eval_splits = ["dev"] if task == "MSMARCO" else ["test"]
     evaluation = MTEB(
-        tasks=[task], task_langs=["en"]
+        tasks=[task], task_langs=["en"], debug_downsample=500
     )  # Remove "en" for running all languages
     evaluation.run(
         model, output_folder=f"results/{model_name}", eval_splits=eval_splits
