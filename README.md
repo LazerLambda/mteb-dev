@@ -32,8 +32,10 @@
 
 ## Installation
 
+Open terminal in this directory:
+
 ```bash
-pip install mteb
+pip install .
 ```
 
 ## Usage
