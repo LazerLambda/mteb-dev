@@ -33,6 +33,11 @@ class AbsTaskSTS(AbsTask):
         def normalize(x):
             return (x - self.min_score) / (self.max_score - self.min_score)
 
+        if bool(self.debug_downsample):
+            data_split = data_split.shuffle(seed=42)
+            n = min(self.debug_downsample, len(data_split))
+            data_split = data_split.select(range(n))
+            logger.info(f"Downsampled to {n} samples.")
         normalized_scores = list(map(normalize, data_split["score"]))
         evaluator = STSEvaluator(
             data_split["sentence1"],

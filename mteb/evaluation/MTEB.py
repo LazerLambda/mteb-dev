@@ -31,6 +31,7 @@ class MTEB:
         tasks: Sequence[str | AbsTask] | None = None,
         version=None,
         err_logs_path="error_logs.txt",
+        debug_downsample: int = 0,
         **kwargs,
     ):
         """Create an Evaluation pipeline. The tasks selected
@@ -51,8 +52,10 @@ class MTEB:
             tasks: List of tasks to be evaluated. If specified, we filter tasks based on `task_langs` only
             version: Version of the benchmark to use. If None, latest is used
             err_logs_path: Path to save error logs
+            debug_downsample: Downsample the data for debugging purposes. Default is 0 (no downsampling)
             kwargs: Additional arguments to be passed to the tasks
         """
+        self.debug_downsample = debug_downsample
         self.deprecation_warning(
             task_types, task_categories, task_langs, tasks, version
         )
@@ -191,7 +194,7 @@ class MTEB:
         # Get all existing tasks
         tasks_categories_cls = [cls for cls in AbsTask.__subclasses__()]
         self.tasks_cls = [
-            cls(hf_subsets=self._task_langs, **kwargs)
+            cls(hf_subsets=self._task_langs, debug_downsample=self.debug_downsample, **kwargs)
             for cat_cls in tasks_categories_cls
             for cls in cat_cls.__subclasses__()
             if cat_cls.__name__.startswith("AbsTask")

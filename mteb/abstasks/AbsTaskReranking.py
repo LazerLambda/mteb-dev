@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from typing import Any
 
 from datasets import Dataset
@@ -10,6 +12,7 @@ from mteb.MTEBResults import ScoresDict
 from ..evaluation.evaluators import RerankingEvaluator
 from .AbsTask import AbsTask
 
+logger = logging.getLogger(__name__)
 
 class AbsTaskReranking(AbsTask):
     """Abstract class for re-ranking experiments.
@@ -29,6 +32,11 @@ class AbsTaskReranking(AbsTask):
         data_split: Dataset,
         **kwargs: Any,
     ) -> ScoresDict:
+        if bool(self.debug_downsample):
+            data_split = data_split.shuffle(seed=42)
+            n = min(self.debug_downsample, len(data_split))
+            data_split = data_split.select(range(n))
+            logger.info(f"Downsampled to {n} samples.")
         evaluator = RerankingEvaluator(data_split, **kwargs)
         scores = evaluator(model)
 

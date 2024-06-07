@@ -51,7 +51,8 @@ class AbsTask(ABC):
     metadata: TaskMetadata
     superseeded_by: None | str = None
 
-    def __init__(self, seed: int = 42, **kwargs: Any):
+    def __init__(self, seed: int = 42, debug_downsample: int = 0, **kwargs: Any):
+        self.debug_downsample = debug_downsample
         self.dataset = None
         self.data_loaded = False
         self.is_multilingual = False

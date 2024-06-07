@@ -83,6 +83,11 @@ class AbsTaskClassification(AbsTask):
                 ds = self.dataset
             else:
                 ds = self.dataset[hf_subset]
+            if bool(self.debug_downsample):
+                ds[eval_split] = ds[eval_split].shuffle(seed=42)
+                n = min(len(ds[eval_split]), self.debug_downsample)
+                ds[eval_split] = ds[eval_split].select(range(n))
+                logger.info(f"Downsampled to {n} samples.")
             scores[hf_subset] = self._evaluate_subset(
                 model, ds, eval_split, train_split, **kwargs
             )

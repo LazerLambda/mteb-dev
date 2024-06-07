@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import random
 from collections import defaultdict
 
 from datasets import Dataset
@@ -37,6 +38,13 @@ class AbsTaskPairClassification(AbsTask):
         **kwargs,
     ) -> ScoresDict:
         data_split = dataset[0]
+        if bool(self.debug_downsample):
+            combined = list(zip(*[data_split[split] for split in data_split.keys()]))
+            random.shuffle(combined)
+            n = min(self.debug_downsample, min([len(data_split[split]) for split in data_split.keys()]))
+            combined = combined[0:n]
+            data_split = {v:[e[i] for e in combined] for i,v in enumerate(data_split.keys())}
+            logger.info(f"Downsampled to {n} samples.")
         logging.getLogger(
             "sentence_transformers.evaluation.PairClassificationEvaluator"
         ).setLevel(logging.WARN)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import numpy as np
+import random
 import tqdm
 from datasets import Dataset
 
@@ -35,9 +36,17 @@ class AbsTaskClustering(AbsTask):
     ) -> ScoresDict:
         v_measures = []
         for cluster_set in tqdm.tqdm(dataset, desc="Clustering"):
+            ds = cluster_set
+            if bool(self.debug_downsample):
+                combined = list(zip(*[ds[split] for split in ds.keys()]))
+                random.shuffle(combined)
+                n = min(self.debug_downsample, min([len(ds[split]) for split in ds.keys()]))
+                combined = combined[0:n]
+                ds = {v:[e[i] for e in combined] for i,v in enumerate(ds.keys())}
+                logger.info(f"Downsampled to {n} samples.")
             evaluator = ClusteringEvaluator(
-                cluster_set["sentences"],  # type: ignore
-                cluster_set["labels"],  # type: ignore
+                ds["sentences"],  # type: ignore
+                ds["labels"],  # type: ignore
                 **kwargs,
             )
             metrics = evaluator(model)
